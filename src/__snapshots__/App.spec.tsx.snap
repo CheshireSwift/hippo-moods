@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`the App component matches the snapshot 1`] = `
+.emotion-0 {
+  color: magenta;
+}
+
+<div
+  class="emotion-0"
+>
+  Hi
+</div>
+`;
