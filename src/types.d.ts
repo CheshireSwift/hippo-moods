@@ -3,4 +3,7 @@ type DayData = {
   mood: number // 0-10
 }
 
-type MoodData = DayData[]
+type ProportionData = {
+  dateProportion: number;
+  moodProportion: number;
+};
