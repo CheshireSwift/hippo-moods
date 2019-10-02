@@ -4,27 +4,35 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "format": "prettier --write src/**/*.{js,jsx,ts,tsx}",
     "start": "parcel src/index.html",
     "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/enzyme": "^3.10.3",
-    "@types/jest": "^24.0.18",
+    "@types/lodash": "^4.14.141",
+    "@types/moment": "^2.13.0",
     "@types/react": "^16.9.4",
     "@types/react-dom": "^16.9.1",
     "emotion": "^10.0.17",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "parcel-bundler": "^1.12.3",
+    "react": "^16.10.1",
+    "react-dom": "^16.10.1",
+    "typescript": "^3.6.3"
+  },
+  "devDependencies": {
+    "@types/enzyme": "^3.10.3",
+    "@types/jest": "^24.0.18",
+    "concurrently": "^4.1.2",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "enzyme-to-json": "^3.4.0",
     "jest": "^24.9.0",
     "jest-emotion": "^10.0.17",
-    "parcel-bundler": "^1.12.3",
     "prettier": "^1.18.2",
-    "react": "^16.10.1",
-    "react-dom": "^16.10.1",
-    "ts-jest": "^24.1.0",
-    "typescript": "^3.6.3"
+    "ts-jest": "^24.1.0"
   }
 }
