@@ -1,4 +1,4 @@
-import Vector from "../maths/Vector";
+import Vector from '../maths/Vector';
 
 export const polarOffset = (
   center: Vector,

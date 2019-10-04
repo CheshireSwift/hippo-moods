@@ -15,7 +15,7 @@ const gradations = (frequency: number) =>
   ));
 
 const scaledSin = (x: number, amplitude: number) =>
-  amplitude * Math.sin((Math.PI / 100) * x);
+  amplitude * Math.sin(2 * (Math.PI / 100) * x);
 
 export const SineChart = ({
   data,
@@ -51,14 +51,14 @@ export const SineChart = ({
         fill="red"
       />
     ))}
-    {_.range(-250, 150, 100).map((x) => (
+    {_.range(-325, 100, 50).map((x) => (
       <path
         key={x}
         d={halfSine(
           x + offset * 100,
           scaledSin(x, amplitude),
-          x + 100 + offset * 100,
-          scaledSin(x + 100, amplitude),
+          x + 50 + offset * 100,
+          scaledSin(x + 50, amplitude),
         )}
         stroke="pink"
         fill="none"

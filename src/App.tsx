@@ -5,11 +5,37 @@ import React from 'react';
 import allData from './data.json';
 import RadialChart from './drawing/RadialChart';
 import SineChart from './drawing/SineChart';
+import { sumOfSquares } from './sharedMaths';
+
+const cycleLengthGuesser = new Worker('./computeCycleLength.ts');
+
+function guessCycleLength(startingGuess: number) {
+  cycleLengthGuesser.postMessage([
+    Math.floor(startingGuess * 0.5),
+    Math.floor(startingGuess * 1.5),
+  ]);
+}
 
 export const App = () => {
   const [cycleDays, setCycleLength] = React.useState(30);
   const [offset, setOffset] = React.useState(0);
   const [amplitude, setAmplitude] = React.useState(100);
+  const [loadingGuess, setLoadingGuess] = React.useState(false);
+
+  React.useEffect(() => {
+    const receiveGuess = (e: MessageEvent) => {
+      const [cycleGuess, offsetGuess] = e.data;
+      setCycleLength(cycleGuess);
+      setOffset(offsetGuess);
+      setLoadingGuess(false);
+    };
+
+    cycleLengthGuesser.addEventListener('message', receiveGuess);
+
+    return () => {
+      cycleLengthGuesser.removeEventListener('message', receiveGuess);
+    };
+  });
 
   // Assumes sorted data, as does everything below
   const latestPoint = _.last(allData);
@@ -38,34 +64,64 @@ export const App = () => {
   return (
     <div className={css({ width: '100%', maxWidth: '98vh', margin: '0 auto' })}>
       <RadialChart data={proportionalData} />
-      <div>
-        Cycle length: {cycleDays} days
-        <input
-          className={css({ width: '100%' })}
-          type="range"
-          min={0}
-          max={365}
-          value={cycleDays}
-          onChange={(e) => setCycleLength(e.target.valueAsNumber)}
-        />
-        Offset: {offset} days
-        <input
-          className={css({ width: '100%' })}
-          type="range"
-          min={0}
-          max={cycleDays}
-          value={offset}
-          onChange={(e) => setOffset(e.target.valueAsNumber)}
-        />
-        Peak mood: {amplitude / 10}
-        <input
-          className={css({ width: '100%' })}
-          type="range"
-          min={0}
-          max={100}
-          value={amplitude}
-          onChange={(e) => setAmplitude(e.target.valueAsNumber)}
-        />
+      <div className={css({ display: 'flex' })}>
+        <div className={css({ padding: '0 0.5rem' })}>
+          <button
+            className={css({
+              width: '6rem',
+              height: '100%',
+              fontSize: 36,
+              background: '#eeeeee08',
+              border: '1px solid #eeeeee08',
+              ':hover': {
+                background: '#eeeeee10',
+                border: '1px solid #eeeeee',
+              },
+              ':disabled': {
+                opacity: 0.1,
+              },
+            })}
+            disabled={loadingGuess}
+            onClick={() => {
+              setLoadingGuess(true);
+              guessCycleLength(cycleDays);
+            }}
+          >
+            {loadingGuess ? '⏳' : '🔍'}
+          </button>
+        </div>
+        <div>
+          Cycle length: {cycleDays} days
+          <input
+            className={css({ width: '100%' })}
+            type="range"
+            min={1}
+            max={365}
+            value={cycleDays}
+            onChange={(e) => setCycleLength(e.target.valueAsNumber)}
+          />
+          Offset: {offset} days
+          <input
+            className={css({ width: '100%' })}
+            type="range"
+            min={0}
+            max={cycleDays}
+            value={offset}
+            onChange={(e) => setOffset(e.target.valueAsNumber)}
+          />
+          Average mania (depression) peak: {(5 + amplitude / 20).toFixed(2)} (
+          {(5 - amplitude / 20).toFixed(2)}
+          )
+          <input
+            className={css({ width: '100%' })}
+            type="range"
+            min={0}
+            max={100}
+            value={amplitude}
+            onChange={(e) => setAmplitude(e.target.valueAsNumber)}
+          />
+          Error: {sumOfSquares(allData)([cycleDays, offset])}
+        </div>
       </div>
       <SineChart
         data={proportionalData}
