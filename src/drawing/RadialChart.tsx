@@ -56,6 +56,7 @@ const DataPoint = ({
         color={rgbTriadToCss(colorForPoint(point))}
         startProportion={point.dateProportion}
         endProportion={point.dateProportion}
+        className={css({ ':hover': { strokeWidth: 140 } })}
       />
     </>
   );
@@ -79,7 +80,13 @@ const DataEdge = ({
   />
 );
 
-export const RadialChart = ({ data }: { data: ProportionData[] }) => {
+export const RadialChart = ({
+  data,
+  offset,
+}: {
+  data: ProportionData[];
+  offset: number;
+}) => {
   const filteredData = data.filter((point) => point.dateProportion >= 0);
 
   // Highest/lowest mood scores recorded
@@ -102,11 +109,65 @@ export const RadialChart = ({ data }: { data: ProportionData[] }) => {
       end && <DataEdge key={start.dateProportion} start={start} end={end} />,
   );
 
+  const patternId = 'pattern-outer-ring-conical-gradient';
+  const gradientId = 'red-blue-gradient';
+  const outerRing = (
+    <>
+      <defs>
+        <linearGradient id={gradientId} gradientTransform="rotate(90)">
+          <stop offset="0%" stopColor="#ff0000" />
+          <stop offset="50%" stopColor="#880088" />
+          <stop offset="100%" stopColor="#0000ff" />
+        </linearGradient>
+        <pattern
+          id={patternId}
+          x="-700"
+          y="-700"
+          width="1400"
+          height="1400"
+          patternUnits="userSpaceOnUse"
+        >
+          <rect
+            shapeRendering="crispEdges"
+            x="0"
+            y="0"
+            width="700"
+            height="1400"
+            fill={`url(#${gradientId})`}
+          />
+          <rect
+            shapeRendering="crispEdges"
+            x="700"
+            y="0"
+            width="700"
+            height="1400"
+            fill={`url(#${gradientId})`}
+          />
+        </pattern>
+      </defs>
+
+      <RoundedArc
+        color={`url(#${patternId})`}
+        startProportion={0}
+        endProportion={1}
+        radius={650}
+        thickness={50}
+        className={css({
+          opacity: 0.3,
+          transform: `rotate(${90 + 360 * offset}deg)`,
+          transition: 'opacity 0.25s, stroke-width 0.5s',
+          ':hover': { opacity: 1, strokeWidth: 100 },
+        })}
+      />
+    </>
+  );
+
   return (
     <svg
       className={css({ margin: '4rem 20%', width: '60%' })}
-      viewBox="-600 -600 1200 1200"
+      viewBox="-700 -700 1400 1400"
     >
+      {outerRing}
       {curves}
       {blobs}
     </svg>

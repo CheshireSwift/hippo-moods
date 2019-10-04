@@ -63,7 +63,7 @@ export const App = () => {
 
   return (
     <div className={css({ width: '100%', maxWidth: '98vh', margin: '0 auto' })}>
-      <RadialChart data={proportionalData} />
+      <RadialChart data={proportionalData} offset={offset / cycleDays} />
       <div className={css({ display: 'flex' })}>
         <div className={css({ padding: '0 0.5rem' })}>
           <button
@@ -73,6 +73,7 @@ export const App = () => {
               fontSize: 36,
               background: '#eeeeee08',
               border: '1px solid #eeeeee08',
+              transition: 'opacity 1s, background 0.25s, border 0.25s',
               ':hover': {
                 background: '#eeeeee10',
                 border: '1px solid #eeeeee',
