@@ -1,6 +1,6 @@
 import { StrokeWidthProperty } from 'csstype';
 import { css, cx } from 'emotion';
-import React from 'react';
+import React, { SVGProps } from 'react';
 import Vector from '../maths/Vector';
 import { arcPath } from './utils';
 
@@ -12,7 +12,7 @@ export type ArcProps = {
   linecap: React.SVGAttributes<SVGPathElement>['strokeLinecap'];
   radius?: number;
   className?: string;
-};
+} & SVGProps<SVGPathElement>;
 export const Arc = ({
   color,
   thickness = 100,
@@ -21,8 +21,10 @@ export const Arc = ({
   linecap,
   radius = 500,
   className,
+  ...rest
 }: ArcProps) => (
   <path
+    {...rest}
     className={cx(
       css({
         stroke: color,

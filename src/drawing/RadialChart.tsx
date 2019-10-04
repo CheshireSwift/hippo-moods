@@ -87,6 +87,9 @@ export const RadialChart = ({
   data: ProportionData[];
   offset: number;
 }) => {
+  const [mouseAngle, setMouseAngle] = React.useState<number | null>(null);
+  const svgRef = React.useRef<SVGSVGElement>(null);
+
   const filteredData = data.filter((point) => point.dateProportion >= 0);
 
   // Highest/lowest mood scores recorded
@@ -147,6 +150,32 @@ export const RadialChart = ({
       </defs>
 
       <RoundedArc
+        onMouseMove={(e) => {
+          const svg = svgRef.current;
+          const transformMatrix = svg && svg.getScreenCTM();
+          if (!svg || !transformMatrix) {
+            return;
+          }
+
+          const pt = svg.createSVGPoint();
+          pt.x = e.clientX;
+          pt.y = e.clientY;
+          const mousePos = pt.matrixTransform(transformMatrix.inverse());
+          const newAngle = Math.atan2(mousePos.y, mousePos.x);
+
+          // Not perfect but good enough...
+          const change = mouseAngle && newAngle - mouseAngle;
+          if (change && change > Math.PI) {
+            setMouseAngle(newAngle - Math.PI * 2);
+          } else if (change && change < -Math.PI) {
+            setMouseAngle(newAngle + Math.PI * 2);
+          } else {
+            setMouseAngle(newAngle);
+          }
+        }}
+        onMouseLeave={(e) => {
+          setMouseAngle(null);
+        }}
         color={`url(#${patternId})`}
         startProportion={0}
         endProportion={1}
@@ -155,10 +184,27 @@ export const RadialChart = ({
         className={css({
           opacity: 0.3,
           transform: `rotate(${90 + 360 * offset}deg)`,
-          transition: 'opacity 0.25s, stroke-width 0.5s',
+          transition: 'opacity 0.25s, stroke-width 0.5s, transform 0.5s',
           ':hover': { opacity: 1, strokeWidth: 100 },
         })}
       />
+      {mouseAngle && (
+        <circle
+          className={css({
+            pointerEvents: 'none',
+            transition: 'transform 0.1s',
+            transform: `rotate(${mouseAngle}rad)`,
+            // transform: `translate(${mouseAngleVec.x *
+            //   650}px, ${mouseAngleVec.y * 650}px)`,
+          })}
+          cx={650}
+          cy={0}
+          r={50}
+          // fill="none"
+          stroke="white"
+          strokeWidth="10"
+        />
+      )}
     </>
   );
 
@@ -166,6 +212,7 @@ export const RadialChart = ({
     <svg
       className={css({ margin: '4rem 20%', width: '60%' })}
       viewBox="-700 -700 1400 1400"
+      ref={svgRef}
     >
       {outerRing}
       {curves}
